@@ -1,0 +1,17 @@
+{
+  "name": "strawberry-outbreak",
+  "version": "1.0.0",
+  "description": "A survival game with Banana API life recovery",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.3.0",
+    "express-session": "^1.19.0"
+  }
+}
