@@ -1,73 +1,17 @@
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: #101827;
-  color: white;
-  font-family: Arial, sans-serif;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-main {
-  width: 95%;
-  max-width: 1000px;
-  text-align: center;
-}
-
-h1 {
-  font-size: 42px;
-  color: #ff5f87;
-}
-
-h2 {
-  color: #ffd166;
-}
-
-button {
-  padding: 14px 28px;
-  background: #ff477e;
-  color: white;
-
-  border: none;
-  border-radius: 10px;
-
-  cursor: pointer;
-  font-size: 17px;
-}
-
-button:hover {
-  background: #e6326b;
-}
-
-#menu {
-  padding: 50px 20px;
-  background: #1b2940;
-  border-radius: 20px;
-}
-
-#gameScreen {
-  padding: 20px;
-}
-
-canvas {
-  display: block;
-  width: 100%;
-  max-width: 800px;
-  height: auto;
-  margin: 20px auto;
-
-  background: #173b2e;
-  border: 4px solid #ff477e;
-  border-radius: 12px;
-}
-
-[hidden] {
-  display: none !important;
-}
+* { box-sizing: border-box; }
+body { margin:0; min-height:100vh; background:#101827; color:#fff; font-family:Arial,sans-serif; display:grid; place-items:center; }
+main { width:min(95%,980px); text-align:center; padding:24px; }
+h1 { font-size:clamp(28px,5vw,46px); color:#fb7185; }
+h2 { color:#fde68a; }
+section { background:#1b2940; border-radius:20px; padding:24px; margin:auto; }
+button, select, input { font:inherit; padding:12px 16px; border-radius:9px; margin:5px; }
+button { background:#f43f5e; color:#fff; border:none; cursor:pointer; }
+button:disabled { opacity:.5; cursor:default; }
+input, select { border:1px solid #94a3b8; background:#fff; color:#111827; }
+canvas { display:block; max-width:100%; height:auto; margin:15px auto; border:4px solid #fb7185; border-radius:12px; }
+[hidden] { display:none !important; }
+#globalMessage { color:#fde68a; min-height:1.5em; }
+#leaderboardList { max-width:480px; margin:18px auto; text-align:left; line-height:1.8; }
+.rescuePanel { position:fixed; inset:0; z-index:10; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; padding:20px; background:rgba(12,20,35,.96); }
+.rescuePanel img { max-width:min(500px,90vw); max-height:45vh; background:#fff; border-radius:10px; object-fit:contain; }
+.rescuePanel input { width:150px; }

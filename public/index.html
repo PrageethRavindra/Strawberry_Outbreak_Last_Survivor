@@ -1,54 +1,68 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-  <title>Strawberry Outbreak</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strawberry Outbreak — Last Survivor</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
-
 <body>
   <main>
-    <section id="menu">
+    <section id="authSection" hidden>
       <h1>🍓 Strawberry Outbreak</h1>
       <h2>Last Survivor</h2>
+      <form id="authForm">
+        <select id="authMode"><option value="register">Register</option><option value="login">Login</option></select>
+        <input id="username" placeholder="Player name" required maxlength="20" autocomplete="username">
+        <input id="password" placeholder="Password (8+ characters)" type="password" required autocomplete="current-password">
+        <button type="submit">Continue</button>
+      </form>
+    </section>
 
-      <p>
-        Survive three dangerous stages.
-        You have only one life!
-      </p>
-
-      <button id="startBtn">
-        Start Survival
-      </button>
+    <section id="menu" hidden>
+      <h1>🍓 Strawberry Outbreak</h1>
+      <h2>Last Survivor</h2>
+      <p>Welcome, <strong id="accountName"></strong></p>
+      <p>Survive 3 stages with only 1 life. Solve Banana API puzzles to revive (maximum 3 per run).</p>
+      <button id="startBtn">Start / Resume Survival</button>
+      <button id="leaderboardBtn" type="button">Leaderboard</button>
+      <button id="logoutBtn" type="button">Logout</button>
+      <ol id="leaderboardList" hidden></ol>
     </section>
 
     <section id="gameScreen" hidden>
-      <h2>Stage 1 - Infected Forest</h2>
+      <h2 id="stageTitle">Infected Forest</h2>
+      <p>❤️ One life · <span id="revives">Rescues left: 3</span></p>
+      <canvas id="gameCanvas" width="800" height="480"></canvas>
+      <p>Move using WASD or arrow keys. Shooting is automatic.</p>
+      <button id="backBtn" type="button">End this run</button>
 
-      <canvas
-        id="gameCanvas"
-        width="800"
-        height="480">
-      </canvas>
-      <p id="gameStatus" role="status"></p>
-      <button id="restartStageBtn" hidden>Retry this stage (temporary)</button>
-      <p>Move with WASD or Arrow Keys</p>
-
-      <button id="backBtn">
-        Back to Menu
-      </button>
+      <div id="rescuePanel" class="rescuePanel" hidden>
+        <h2>🍌 Banana Rescue Challenge</h2>
+        <p>Solve this real API puzzle to get your life back.</p>
+        <img id="bananaImage" alt="Banana missing digit puzzle" hidden>
+        <form id="rescueForm">
+          <input id="bananaAnswer" type="number" min="0" max="9" required placeholder="Missing digit">
+          <button id="bananaSubmit" type="submit">Revive</button>
+        </form>
+        <button id="bananaReload" type="button">Retry loading the image</button>
+        <p id="rescueMessage" role="status"></p>
+      </div>
     </section>
+
+    <section id="resultScreen" hidden>
+      <h1 id="resultText">Game Over</h1>
+      <button id="againBtn" type="button">Main menu</button>
+    </section>
+    <p id="globalMessage" role="status"></p>
   </main>
   <script src="/js/player.js" defer></script>
   <script src="/js/enemies.js" defer></script>
   <script src="/js/projectiles.js" defer></script>
   <script src="/js/levels.js" defer></script>
   <script src="/js/game.js" defer></script>
+  <script src="/js/api.js" defer></script>
+  <script src="/js/rescue.js" defer></script>
   <script src="/js/app.js" defer></script>
-
 </body>
 </html>
