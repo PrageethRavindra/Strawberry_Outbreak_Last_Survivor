@@ -1,10 +1,13 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'strawberry-test-'));
+process.env.DB_FILE = ':memory:';
 const runs = require('../src/runs');
+const { db } = require('../src/db');
+
+// Runs must belong to a real user (foreign key), so create the test users first.
+const addUser = db.prepare('INSERT INTO users (id, username, password_hash) VALUES (?, ?, ?)');
+for (const id of ['tester', 'wrong-answer-user', 'refresh-user', 'stage-user', 'log-user', 'history-user'])
+  addUser.run(id, id.replace(/-/g, '_'), 'x');
 
 test('only three correct Banana rescues are allowed', () => {
   const uid = 'tester';

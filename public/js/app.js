@@ -25,7 +25,7 @@
   }
   function onCorrectRescue(run) {
     sync(run);
-    notify('Correct! Life restored. You have 2 seconds of protection.');
+    notify('Correct! Life restored. You have 3 seconds of protection.');
     window.SurvivalGame.revive();
   }
   async function onComplete(stage) {

@@ -6,6 +6,11 @@
   const submit = document.getElementById('bananaSubmit');
   const reload = document.getElementById('bananaReload');
   let handlers = null;
+
+  // Keep only a single digit in the answer box.
+  input.addEventListener('input', () => {
+    input.value = input.value.replace(/\D/g, '').slice(-1);
+  });
   image.addEventListener('error', () => {
     info.textContent = 'Puzzle image failed to load. Try again.';
     submit.disabled = true;
