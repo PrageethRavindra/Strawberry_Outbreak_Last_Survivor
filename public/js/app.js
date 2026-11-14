@@ -8,6 +8,7 @@
   function show(screen) {
     for (const id of ids) byId(id).hidden = id !== screen;
     notify('');
+    if (screen === 'authSection') window.AuthUI.onShow();
   }
   function sync(run) {
     currentRun = run;
@@ -50,15 +51,21 @@
 
   byId('authForm').addEventListener('submit', async e => {
     e.preventDefault();
+    const auth = window.AuthUI;
+    const problem = auth.validate();
+    if (problem) return auth.showError(problem);
+    auth.setBusy(true);
     try {
-      const mode = byId('authMode').value;
-      const data = await window.GameApi.post(`/api/auth/${mode}`, {
-        username: byId('username').value.trim(), password: byId('password').value
-      });
+      const data = await window.GameApi.post(`/api/auth/${auth.mode()}`, auth.credentials());
+      auth.rememberAccount();
       player = data.user;
       byId('accountName').textContent = player.username;
       show('menu');
-    } catch (error) { notify(error.message); }
+    } catch (error) {
+      auth.showError(error.message);
+    } finally {
+      auth.setBusy(false);
+    }
   });
 
   byId('startBtn').addEventListener('click', async () => {
@@ -107,6 +114,6 @@
       if (!user) return show('authSection');
       byId('accountName').textContent = user.username;
       show('menu');
-    } catch (error) { show('authSection'); notify(error.message); }
+    } catch (error) { show('authSection'); window.AuthUI.showError(error.message); }
   })();
 })();

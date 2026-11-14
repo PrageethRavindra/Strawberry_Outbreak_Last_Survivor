@@ -4,19 +4,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Strawberry Outbreak — Last Survivor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
   <main>
-    <section id="authSection" hidden>
-      <h1>🍓 Strawberry Outbreak</h1>
-      <h2>Last Survivor</h2>
-      <form id="authForm">
-        <select id="authMode"><option value="register">Register</option><option value="login">Login</option></select>
-        <input id="username" placeholder="Player name" required maxlength="20" autocomplete="username">
-        <input id="password" placeholder="Password (8+ characters)" type="password" required autocomplete="current-password">
-        <button type="submit">Continue</button>
-      </form>
+    <section id="authSection" class="auth" hidden>
+      <div class="auth-rain" id="authRain" aria-hidden="true"></div>
+
+      <div class="auth-card" id="authCard">
+        <aside class="auth-hero">
+          <div class="auth-logo" aria-hidden="true">🍓</div>
+          <h1>Strawberry Outbreak</h1>
+          <p class="auth-tagline">Last Survivor</p>
+
+          <ul class="auth-features">
+            <li><span class="feature-icon" aria-hidden="true">🧟</span>
+              <div><strong>3 deadly stages</strong><small>One life against waves, runners, tanks and a boss.</small></div></li>
+            <li><span class="feature-icon" aria-hidden="true">🍌</span>
+              <div><strong>Banana rescues</strong><small>Caught? Solve the puzzle to come back, up to 3 times per run.</small></div></li>
+            <li><span class="feature-icon" aria-hidden="true">🏆</span>
+              <div><strong>Leaderboard</strong><small>Fewer rescues means a higher score.</small></div></li>
+          </ul>
+
+          <div class="auth-top" id="authTop" hidden>
+            <h3>Top survivors</h3>
+            <ol id="authTopList"></ol>
+          </div>
+        </aside>
+
+        <div class="auth-panel">
+          <div class="auth-tabs" role="tablist" aria-label="Account">
+            <button type="button" role="tab" id="tabLogin" data-mode="login" aria-controls="authForm">Log in</button>
+            <button type="button" role="tab" id="tabRegister" data-mode="register" aria-controls="authForm">Sign up</button>
+            <span class="auth-tab-indicator" aria-hidden="true"></span>
+          </div>
+
+          <h2 id="authHeading">Welcome back, survivor</h2>
+          <p class="auth-sub" id="authSub">Log in to continue your run.</p>
+
+          <form id="authForm" novalidate>
+            <div class="field">
+              <label for="username">Player name</label>
+              <div class="input-wrap">
+                <span class="input-icon" aria-hidden="true">👤</span>
+                <input id="username" name="username" maxlength="20" autocomplete="username" spellcheck="false"
+                  autocapitalize="off" placeholder="e.g. berry_hunter" aria-describedby="usernameHint">
+                <span class="input-status" id="usernameStatus" aria-hidden="true"></span>
+              </div>
+              <small class="hint" id="usernameHint">3–20 letters, numbers or underscores.</small>
+            </div>
+
+            <div class="field">
+              <label for="password">Password</label>
+              <div class="input-wrap">
+                <span class="input-icon" aria-hidden="true">🔒</span>
+                <input id="password" name="password" type="password" maxlength="72" autocomplete="current-password"
+                  placeholder="Your password" aria-describedby="passwordHint">
+                <button type="button" class="toggle-visibility" data-target="password" aria-label="Show password">Show</button>
+              </div>
+              <div class="register-only">
+                <div class="strength" aria-hidden="true"><span id="strengthBar"></span></div>
+                <small class="hint" id="passwordHint">At least 8 characters.</small>
+              </div>
+            </div>
+
+            <div class="field register-only">
+              <label for="passwordConfirm">Confirm password</label>
+              <div class="input-wrap">
+                <span class="input-icon" aria-hidden="true">🔁</span>
+                <input id="passwordConfirm" name="passwordConfirm" type="password" maxlength="72" autocomplete="new-password"
+                  placeholder="Type it again" aria-describedby="confirmHint">
+                <span class="input-status" id="confirmStatus" aria-hidden="true"></span>
+              </div>
+              <small class="hint" id="confirmHint"></small>
+            </div>
+
+            <p class="caps-warning" id="capsWarning" hidden>⇪ Caps Lock is on</p>
+            <p class="form-error" id="authError" role="alert"></p>
+
+            <button type="submit" class="auth-submit" id="authSubmit">Log in</button>
+          </form>
+
+          <p class="auth-switch"><span id="switchText">New here?</span>
+            <button type="button" class="link-btn" id="switchBtn">Create an account</button></p>
+        </div>
+      </div>
     </section>
 
     <section id="menu" hidden>
@@ -75,6 +151,7 @@
   <script src="/js/game.js" defer></script>
   <script src="/js/api.js" defer></script>
   <script src="/js/rescue.js" defer></script>
+  <script src="/js/auth-ui.js" defer></script>
   <script src="/js/app.js" defer></script>
 </body>
 </html>

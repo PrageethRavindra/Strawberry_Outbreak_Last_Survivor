@@ -1,5 +1,5 @@
 * { box-sizing: border-box; }
-body { margin:0; min-height:100vh; background:#101827; color:#fff; font-family:Arial,sans-serif; display:grid; place-items:center; }
+body { margin:0; min-height:100vh; background:#101827; color:#fff; font-family:Arial,sans-serif; display:grid; grid-template-columns:minmax(0,1fr); place-items:center; }
 main { width:min(95%,980px); text-align:center; padding:24px; }
 h1 { font-size:clamp(28px,5vw,46px); color:#fb7185; }
 h2 { color:#fde68a; }
