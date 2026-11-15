@@ -1,5 +1,5 @@
-/* ---------- Login / Sign up screen ---------- */
-.auth {
+/* ---------- Login / Sign up screen (colour tokens shared with the menu) ---------- */
+.auth, .menu {
   --berry: #f43f5e;
   --berry-deep: #be123c;
   --leaf: #34d399;

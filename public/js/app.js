@@ -9,6 +9,7 @@
     for (const id of ids) byId(id).hidden = id !== screen;
     notify('');
     if (screen === 'authSection') window.AuthUI.onShow();
+    if (screen === 'menu') loadMenu();
   }
   function sync(run) {
     currentRun = run;
@@ -95,17 +96,92 @@
     player = null;
     show('authSection');
   });
-  byId('leaderboardBtn').addEventListener('click', async () => {
-    try {
-      const { entries } = await window.GameApi.get('/api/leaderboard');
-      byId('leaderboardList').replaceChildren(...entries.map((e, i) => {
-        const li = document.createElement('li');
-        li.textContent = `${i + 1}. ${e.username} — ${e.score} points (${e.revivesUsed} rescues)`;
-        return li;
-      }));
-      byId('leaderboardList').hidden = false;
-    } catch (error) { notify(error.message); }
-  });
+  // ---- Menu (landing page after login) ------------------------------------
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const stageColors = ['#16a34a', '#2563eb', '#9333ea'];
+
+  function stageObjective(stage) {
+    if (stage.goalKills) return `Defeat ${stage.goalKills} enemies · ${stage.seconds}s`;
+    if (stage.bossHp) return `Defeat the boss (${stage.bossHp} HP) · ${stage.seconds}s`;
+    return `Survive the waves · ${stage.seconds}s`;
+  }
+
+  function renderRun(run) {
+    const active = run && ['playing', 'awaiting_rescue'].includes(run.status);
+    const currentStage = active ? run.stage : 1;
+    const rescuing = active && run.status === 'awaiting_rescue';
+
+    byId('startLabel').textContent = active ? `Resume — Stage ${run.stage}` : 'Start survival';
+    byId('startHint').textContent = rescuing ? '🍌 A rescue puzzle is waiting'
+      : active ? `${window.SurvivalStages.get(run.stage).name}` : '3 stages · 3 rescues';
+    byId('menuStatus').textContent = rescuing
+      ? 'You were caught! Solve the Banana puzzle to get back into the fight.'
+      : active ? 'Your run is still alive. Jump back in before the outbreak spreads.'
+        : 'Survive 3 stages with one life. Get caught and solve a Banana puzzle to revive, up to 3 times per run.';
+
+    byId('runPills').hidden = !active;
+    if (active) {
+      byId('pillStage').textContent = `📍 Stage ${run.stage} of 3`;
+      byId('pillRescues').textContent = `❤️ ${run.revivesRemaining} rescue${run.revivesRemaining === 1 ? '' : 's'} left`;
+      byId('pillScore').textContent = `⭐ ${run.score} pts`;
+    }
+
+    byId('stageList').replaceChildren(...window.SurvivalStages.all.map((stage, i) => {
+      const state = !active ? (i === 0 ? 'current' : 'locked')
+        : stage.id < currentStage ? 'done' : stage.id === currentStage ? 'current' : 'locked';
+      const li = el('li', `stage ${state}`);
+      const num = el('span', 'stage-num', state === 'done' ? '✓' : String(stage.id));
+      num.style.background = stageColors[i];
+      const info = el('div');
+      info.append(el('strong', '', stage.name), el('small', '', stageObjective(stage)));
+      const label = { done: 'Cleared', current: active ? 'You are here' : 'Start here', locked: 'Locked' }[state];
+      li.append(num, info, el('span', 'stage-state', label));
+      return li;
+    }));
+  }
+
+  function renderStats(stats) {
+    byId('statRuns').textContent = stats.runsPlayed;
+    byId('statWins').textContent = stats.wins;
+    byId('statBest').textContent = stats.bestScore;
+    byId('statPuzzles').textContent = stats.puzzlesAttempted
+      ? `${stats.puzzlesSolved}/${stats.puzzlesAttempted}` : '0';
+  }
+
+  function renderBoard(entries) {
+    const medals = ['🥇', '🥈', '🥉'];
+    byId('leaderboardList').replaceChildren(...entries.map((entry, i) => {
+      const li = el('li', player && entry.username === player.username ? 'me' : '');
+      const name = el('span', 'name', entry.username);
+      name.append(el('small', '', `${entry.revivesUsed} rescue${entry.revivesUsed === 1 ? '' : 's'}`));
+      li.append(el('span', 'rank', medals[i] || String(i + 1)), name, el('span', 'pts', String(entry.score)));
+      return li;
+    }));
+    byId('boardEmpty').hidden = entries.length > 0;
+  }
+
+  async function loadMenu() {
+    if (!player) return;
+    byId('accountName').textContent = player.username;
+    byId('avatar').textContent = player.username.charAt(0).toUpperCase();
+    byId('menuGreeting').textContent = `Ready, ${player.username}?`;
+    renderRun(currentRun);
+    const [status, stats, board] = await Promise.allSettled([
+      window.GameApi.get('/api/run/status'),
+      window.GameApi.get('/api/me/stats'),
+      window.GameApi.get('/api/leaderboard')
+    ]);
+    if (status.status === 'fulfilled') { sync(status.value.run); renderRun(status.value.run); }
+    byId('statsError').hidden = stats.status === 'fulfilled';
+    if (stats.status === 'fulfilled') renderStats(stats.value.stats);
+    else byId('statsError').textContent = `Stats could not be loaded: ${stats.reason.message}`;
+    if (board.status === 'fulfilled') renderBoard(board.value.entries);
+  }
 
   (async function init() {
     try {

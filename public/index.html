@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/menu.css">
 </head>
 <body>
   <main>
@@ -95,15 +96,72 @@
       </div>
     </section>
 
-    <section id="menu" hidden>
-      <h1>🍓 Strawberry Outbreak</h1>
-      <h2>Last Survivor</h2>
-      <p>Welcome, <strong id="accountName"></strong></p>
-      <p>Survive 3 stages with only 1 life. Solve Banana API puzzles to revive (maximum 3 per run).</p>
-      <button id="startBtn">Start / Resume Survival</button>
-      <button id="leaderboardBtn" type="button">Leaderboard</button>
-      <button id="logoutBtn" type="button">Logout</button>
-      <ol id="leaderboardList" hidden></ol>
+    <section id="menu" class="menu" hidden>
+      <header class="menu-top">
+        <div class="brand">
+          <span class="brand-logo" aria-hidden="true">🍓</span>
+          <div><strong>Strawberry Outbreak</strong><small>Last Survivor</small></div>
+        </div>
+        <div class="user-chip">
+          <span class="avatar" id="avatar" aria-hidden="true">?</span>
+          <strong id="accountName"></strong>
+          <button id="logoutBtn" type="button" class="ghost-btn">Log out</button>
+        </div>
+      </header>
+
+      <div class="menu-hero">
+        <div class="hero-text">
+          <p class="eyebrow" id="menuEyebrow">Welcome back</p>
+          <h1 id="menuGreeting">Ready, survivor?</h1>
+          <p class="hero-sub" id="menuStatus">Survive 3 stages with one life. Get caught and solve a Banana puzzle to revive, up to 3 times per run.</p>
+          <div class="run-pills" id="runPills" hidden>
+            <span class="pill" id="pillStage"></span>
+            <span class="pill" id="pillRescues"></span>
+            <span class="pill" id="pillScore"></span>
+          </div>
+        </div>
+        <button id="startBtn" type="button" class="play-btn">
+          <span class="play-icon" aria-hidden="true">▶</span>
+          <span><strong id="startLabel">Start survival</strong><small id="startHint">3 stages · 3 rescues</small></span>
+        </button>
+      </div>
+
+      <div class="menu-grid">
+        <div class="menu-col">
+          <div class="panel">
+            <h3>Stages</h3>
+            <ol class="stage-list" id="stageList"></ol>
+          </div>
+          <div class="panel">
+            <h3>Your stats</h3>
+            <div class="stat-grid">
+              <div class="stat"><strong id="statRuns">–</strong><small>Runs played</small></div>
+              <div class="stat"><strong id="statWins">–</strong><small>Wins</small></div>
+              <div class="stat"><strong id="statBest">–</strong><small>Best score</small></div>
+              <div class="stat"><strong id="statPuzzles">–</strong><small>Puzzles solved</small></div>
+            </div>
+            <p class="stats-error" id="statsError" role="status" hidden></p>
+          </div>
+        </div>
+
+        <div class="menu-col">
+          <div class="panel">
+            <h3>Leaderboard</h3>
+            <ol class="board" id="leaderboardList"></ol>
+            <p class="board-empty" id="boardEmpty" hidden>No survivors have escaped yet. Be the first!</p>
+          </div>
+          <div class="panel">
+            <h3>How to play</h3>
+            <ul class="howto">
+              <li><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span> Move (or drag on touch screens)</li>
+              <li><span><kbd>Mouse</kbd></span> Aim and hold to fire faster</li>
+              <li><span><kbd>Space</kbd></span> Dash through danger</li>
+              <li><span><kbd>P</kbd></span> Pause &nbsp;·&nbsp; <kbd>M</kbd> Sound</li>
+              <li><span>🍌</span> Caught? Type the missing digit to revive</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="gameScreen" hidden>

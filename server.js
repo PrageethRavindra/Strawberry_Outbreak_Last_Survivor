@@ -6,6 +6,7 @@ const auth = require('./src/auth');
 const runs = require('./src/runs');
 const banana = require('./src/banana');
 const scores = require('./src/scores');
+const stats = require('./src/stats');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -82,6 +83,9 @@ app.post('/api/rescue/answer', requireUser, (req, res) => {
     const run = runs.answer(req.session.user.id, req.body.answer);
     res.json({ correct: run.status === 'playing', run: runs.publicRun(run) });
   } catch (error) { respondError(res, error); }
+});
+app.get('/api/me/stats', requireUser, (req, res) => {
+  res.json({ stats: stats.forUser(req.session.user.id) });
 });
 app.get('/api/leaderboard', (_, res) => res.json({ entries: scores.list() }));
 

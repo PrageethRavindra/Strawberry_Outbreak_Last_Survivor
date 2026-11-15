@@ -5,6 +5,26 @@ const { db } = require('../src/db');
 const auth = require('../src/auth');
 const runs = require('../src/runs');
 const scores = require('../src/scores');
+const stats = require('../src/stats');
+
+test('player stats summarise runs, wins and puzzles', async () => {
+  const user = await auth.register('Stats_User', 'password123');
+  assert.deepEqual(stats.forUser(user.id), {
+    runsPlayed: 0, wins: 0, bestScore: 0, furthestStage: 0, puzzlesAttempted: 0, puzzlesSolved: 0
+  });
+  runs.start(user.id);
+  runs.die(user.id);
+  runs.pendingPuzzle(user.id, { question: 'https://www.sanfoh.com/s.png', solution: 4 });
+  runs.answer(user.id, 4);
+  runs.die(user.id);
+  runs.pendingPuzzle(user.id, { question: 'https://www.sanfoh.com/t.png', solution: 4 });
+  runs.answer(user.id, 0);
+  const result = stats.forUser(user.id);
+  assert.equal(result.runsPlayed, 1);
+  assert.equal(result.furthestStage, 1);
+  assert.equal(result.puzzlesAttempted, 2);
+  assert.equal(result.puzzlesSolved, 1);
+});
 
 test('registers and logs in users stored in SQLite', async () => {
   const user = await auth.register('Berry_Fan', 'password123');
