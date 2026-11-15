@@ -1,20 +1,48 @@
 const express = require('express');
 const session = require('express-session');
-const crypto = require('node:crypto');
+const fs = require('node:fs');
+const http = require('node:http');
+const https = require('node:https');
 const path = require('node:path');
 const auth = require('./src/auth');
 const runs = require('./src/runs');
 const banana = require('./src/banana');
 const scores = require('./src/scores');
 const stats = require('./src/stats');
+const { SqliteStore, sessionSecret } = require('./src/session-store');
 
 const app = express();
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT || 3443);
+const HTTP_PORT = Number(process.env.HTTP_PORT || 3000);
+const TLS_KEY_FILE = process.env.TLS_KEY_FILE || path.join(__dirname, 'certs', 'key.pem');
+const TLS_CERT_FILE = process.env.TLS_CERT_FILE || path.join(__dirname, 'certs', 'cert.pem');
+// Set TRUST_PROXY (e.g. "1") when a reverse proxy terminates HTTPS and forwards X-Forwarded-Proto.
+const TRUST_PROXY = process.env.TRUST_PROXY;
+
 app.disable('x-powered-by');
+if (TRUST_PROXY) app.set('trust proxy', /^\d+$/.test(TRUST_PROXY) ? Number(TRUST_PROXY) : TRUST_PROXY);
+
+// HTTPS only: redirect plain HTTP and tell browsers to stick to HTTPS.
+app.use((req, res, next) => {
+  if (!req.secure) {
+    const host = (req.headers.host || 'localhost').replace(/:\d+$/, '');
+    const port = TRUST_PROXY || PORT === 443 ? '' : `:${PORT}`;
+    return res.redirect(308, `https://${host}${port}${req.originalUrl}`);
+  }
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
+
 app.use(express.json({ limit: '12kb' }));
-const secret = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
-app.use(session({ secret, resave: false, saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 24 * 60 * 60 * 1000 } }));
+app.use(session({
+  name: '__Host-sid', // __Host- prefix: browser only accepts it over HTTPS, host-only, path=/
+  secret: sessionSecret(),
+  store: new SqliteStore(),
+  resave: false,
+  saveUninitialized: false,
+  rolling: true,
+  cookie: { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 24 * 60 * 60 * 1000 }
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 function requireUser(req, res, next) {
@@ -89,5 +117,25 @@ app.get('/api/me/stats', requireUser, (req, res) => {
 });
 app.get('/api/leaderboard', (_, res) => res.json({ entries: scores.list() }));
 
-if (require.main === module) app.listen(PORT, () => console.log(`Game running at http://localhost:${PORT}`));
+function start() {
+  if (TRUST_PROXY) {
+    // TLS is handled by the proxy in front of us.
+    return app.listen(PORT, () => console.log(`Game listening on port ${PORT} behind an HTTPS proxy`));
+  }
+  if (!fs.existsSync(TLS_KEY_FILE) || !fs.existsSync(TLS_CERT_FILE)) {
+    console.error(`HTTPS certificate not found (${TLS_KEY_FILE}, ${TLS_CERT_FILE}).\n` +
+      'Run "npm run cert" for a local self-signed certificate, set TLS_KEY_FILE/TLS_CERT_FILE, ' +
+      'or set TRUST_PROXY when running behind an HTTPS reverse proxy.');
+    process.exit(1);
+  }
+  const tls = { key: fs.readFileSync(TLS_KEY_FILE), cert: fs.readFileSync(TLS_CERT_FILE) };
+  https.createServer(tls, app).listen(PORT, () => console.log(`Game running at https://localhost:${PORT}`));
+  if (HTTP_PORT) {
+    // Plain HTTP only redirects to HTTPS (handled by the middleware above).
+    http.createServer(app).listen(HTTP_PORT, () =>
+      console.log(`Redirecting http://localhost:${HTTP_PORT} to HTTPS`));
+  }
+}
+
+if (require.main === module) start();
 module.exports = app;

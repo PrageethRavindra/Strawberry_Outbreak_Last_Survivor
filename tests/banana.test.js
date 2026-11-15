@@ -25,3 +25,5 @@ test('rejects unsafe image origins', async () => {
 test('reports unavailable API', async () => {
   await assert.rejects(() => getPuzzle(async () => { throw Error('offline'); }), /offline/);
 });
+
+hjgjhnh
