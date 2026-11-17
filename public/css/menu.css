@@ -17,10 +17,47 @@
   display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 6px;
   border-radius: 99px; background: var(--panel); border: 1px solid var(--line);
 }
-.avatar {
-  width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%;
-  background: linear-gradient(135deg, var(--berry), #f97316); color: #fff; font-weight: 700;
+.avatar-chip {
+  width: 38px; height: 38px; margin: 0; padding: 0; display: grid; place-items: center; border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #334155, var(--ink)); border: 2px solid var(--berry);
+  overflow: hidden; transition: transform .15s;
 }
+.avatar-chip:hover { transform: scale(1.08); }
+
+/* Big avatar in the hero */
+.hero-avatar {
+  position: relative; z-index: 1; flex: none; margin: 0; padding: 0;
+  display: grid; justify-items: center; gap: 6px; background: none; color: #fff;
+}
+.hero-avatar-art {
+  width: 104px; height: 104px; display: grid; place-items: center; border-radius: 28px;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, .14), rgba(0, 0, 0, .25));
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: inset 0 -10px 24px rgba(0, 0, 0, .25);
+  transition: transform .2s;
+}
+.hero-avatar:hover .hero-avatar-art { transform: translateY(-3px) rotate(-2deg); }
+.hero-avatar-edit {
+  padding: 3px 10px; border-radius: 99px; font: 600 12px system-ui, 'Segoe UI', Arial, sans-serif;
+  background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .12); color: #e2e8f0;
+}
+.hero-avatar:focus-visible .hero-avatar-art, .avatar-chip:focus-visible { outline: 3px solid var(--banana); outline-offset: 3px; }
+
+/* Avatar dialog */
+.avatar-dialog {
+  width: min(640px, calc(100vw - 32px)); padding: 0; border-radius: 22px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--text);
+  box-shadow: 0 40px 90px -20px rgba(0, 0, 0, .85);
+}
+.avatar-dialog::backdrop { background: rgba(5, 10, 20, .75); backdrop-filter: blur(3px); }
+.avatar-dialog[open] { animation: auth-rise .25s ease-out; }
+.avatar-dialog form { padding: 26px; }
+.avatar-dialog h2 { margin: 0; color: #fff; font-size: 24px; }
+.dialog-sub { margin: 4px 0 18px; color: var(--muted); font-size: 14px; }
+.avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.dialog-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 6px; }
+.dialog-actions .auth-submit { width: auto; padding: 12px 22px; margin: 0; }
+.dialog-actions .ghost-btn { padding: 12px 18px; }
 .user-chip strong { color: #fff; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ghost-btn {
   margin: 0 0 0 4px; padding: 8px 14px; border-radius: 99px; font: 600 13px system-ui, 'Segoe UI', Arial, sans-serif;
@@ -109,7 +146,7 @@
 /* Leaderboard */
 .board { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .board li {
-  display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 10px;
+  display: grid; grid-template-columns: 30px 30px 1fr auto; align-items: center; gap: 10px;
   padding: 9px 12px; border-radius: 12px; background: var(--ink); border: 1px solid transparent;
 }
 .board .rank { text-align: center; color: var(--muted); font-weight: 700; }
@@ -131,6 +168,8 @@
 }
 @media (max-width: 520px) {
   .menu-hero { padding: 22px 18px; }
+  .avatar-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-avatar-art { width: 84px; height: 84px; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .user-chip strong { max-width: 90px; }
   .howto li > span:first-child { min-width: 90px; }

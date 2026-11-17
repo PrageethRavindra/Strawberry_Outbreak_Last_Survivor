@@ -41,7 +41,7 @@
   function launchStage(stage) {
     byId('stageTitle').textContent = window.SurvivalStages.get(stage).name;
     show('gameScreen');
-    window.SurvivalGame.start(stage, { onDeath, onComplete });
+    window.SurvivalGame.start(stage, { onDeath, onComplete, avatar: player && player.avatar });
   }
   function end(text) {
     window.SurvivalGame.stop();
@@ -159,16 +159,57 @@
       const li = el('li', player && entry.username === player.username ? 'me' : '');
       const name = el('span', 'name', entry.username);
       name.append(el('small', '', `${entry.revivesUsed} rescue${entry.revivesUsed === 1 ? '' : 's'}`));
-      li.append(el('span', 'rank', medals[i] || String(i + 1)), name, el('span', 'pts', String(entry.score)));
+      li.append(el('span', 'rank', medals[i] || String(i + 1)), window.SurvivalAvatars.canvas(entry.avatar, 30),
+        name, el('span', 'pts', String(entry.score)));
       return li;
     }));
     byId('boardEmpty').hidden = entries.length > 0;
   }
 
+  // ---- Avatar ---------------------------------------------------------------
+  const Avatars = window.SurvivalAvatars;
+  const avatarDialog = byId('avatarDialog');
+  let avatarChoice = null;
+
+  function renderMyAvatar() {
+    const id = player.avatar || Avatars.DEFAULT;
+    byId('avatarChip').replaceChildren(Avatars.canvas(id, 34));
+    byId('heroAvatarArt').replaceChildren(Avatars.canvas(id, 92));
+    byId('heroAvatar').title = `${Avatars.info(id).name} — click to change`;
+  }
+
+  function openAvatarDialog() {
+    byId('avatarError').textContent = '';
+    avatarChoice = Avatars.picker(byId('avatarGrid'), { selected: player.avatar, size: 72, taglines: true });
+    avatarDialog.showModal();
+    const current = byId('avatarGrid').querySelector('.selected');
+    if (current) current.focus();
+  }
+
+  byId('avatarChip').addEventListener('click', openAvatarDialog);
+  byId('heroAvatar').addEventListener('click', openAvatarDialog);
+  byId('avatarCancel').addEventListener('click', () => avatarDialog.close());
+  avatarDialog.addEventListener('click', e => { if (e.target === avatarDialog) avatarDialog.close(); }); // backdrop
+  byId('avatarForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const save = byId('avatarSave');
+    save.disabled = true;
+    try {
+      const { user } = await window.GameApi.post('/api/me/avatar', { avatar: avatarChoice.value });
+      player = { ...player, avatar: user.avatar };
+      avatarDialog.close();
+      loadMenu();
+    } catch (error) {
+      byId('avatarError').textContent = error.message;
+    } finally {
+      save.disabled = false;
+    }
+  });
+
   async function loadMenu() {
     if (!player) return;
     byId('accountName').textContent = player.username;
-    byId('avatar').textContent = player.username.charAt(0).toUpperCase();
+    renderMyAvatar();
     byId('menuGreeting').textContent = `Ready, ${player.username}?`;
     renderRun(currentRun);
     const [status, stats, board] = await Promise.allSettled([

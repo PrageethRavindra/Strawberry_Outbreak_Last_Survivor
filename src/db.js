@@ -17,6 +17,7 @@ db.exec(`
     id            TEXT PRIMARY KEY,
     username      TEXT NOT NULL UNIQUE COLLATE NOCASE,
     password_hash TEXT NOT NULL,
+    avatar        TEXT NOT NULL DEFAULT 'soldier',
     created_at    TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -55,6 +56,11 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_scores_score ON scores(score DESC);
 `);
+
+// Upgrade databases created before avatars existed.
+if (!db.prepare('PRAGMA table_info(users)').all().some(column => column.name === 'avatar')) {
+  db.exec("ALTER TABLE users ADD COLUMN avatar TEXT NOT NULL DEFAULT 'soldier'");
+}
 
 // Runs fn inside a transaction; rolls back if it throws.
 function transaction(fn) {

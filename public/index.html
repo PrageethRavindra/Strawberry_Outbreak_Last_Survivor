@@ -84,6 +84,11 @@
               <small class="hint" id="confirmHint"></small>
             </div>
 
+            <div class="field register-only">
+              <p class="field-title" id="signupAvatarLabel">Choose your survivor</p>
+              <div class="avatar-row" id="signupAvatars" role="group" aria-labelledby="signupAvatarLabel"></div>
+            </div>
+
             <p class="caps-warning" id="capsWarning" hidden>⇪ Caps Lock is on</p>
             <p class="form-error" id="authError" role="alert"></p>
 
@@ -103,13 +108,17 @@
           <div><strong>Strawberry Outbreak</strong><small>Last Survivor</small></div>
         </div>
         <div class="user-chip">
-          <span class="avatar" id="avatar" aria-hidden="true">?</span>
+          <button type="button" class="avatar-chip" id="avatarChip" aria-label="Change avatar" title="Change avatar"></button>
           <strong id="accountName"></strong>
           <button id="logoutBtn" type="button" class="ghost-btn">Log out</button>
         </div>
       </header>
 
       <div class="menu-hero">
+        <button type="button" class="hero-avatar" id="heroAvatar" aria-label="Change avatar">
+          <span class="hero-avatar-art" id="heroAvatarArt"></span>
+          <span class="hero-avatar-edit">✎ Change</span>
+        </button>
         <div class="hero-text">
           <p class="eyebrow" id="menuEyebrow">Welcome back</p>
           <h1 id="menuGreeting">Ready, survivor?</h1>
@@ -162,6 +171,19 @@
           </div>
         </div>
       </div>
+
+      <dialog class="avatar-dialog" id="avatarDialog" aria-labelledby="avatarDialogTitle">
+        <form id="avatarForm">
+          <h2 id="avatarDialogTitle">Choose your survivor</h2>
+          <p class="dialog-sub">Your avatar is shown in the game, on the menu and on the leaderboard.</p>
+          <div class="avatar-grid" id="avatarGrid" role="group" aria-label="Avatars"></div>
+          <p class="form-error" id="avatarError" role="alert"></p>
+          <div class="dialog-actions">
+            <button type="button" class="ghost-btn" id="avatarCancel">Cancel</button>
+            <button type="submit" class="auth-submit" id="avatarSave">Save avatar</button>
+          </div>
+        </form>
+      </dialog>
     </section>
 
     <section id="gameScreen" hidden>
@@ -200,6 +222,7 @@
     </section>
     <p id="globalMessage" role="status"></p>
   </main>
+  <script src="/js/avatars.js" defer></script>
   <script src="/js/player.js" defer></script>
   <script src="/js/enemies.js" defer></script>
   <script src="/js/projectiles.js" defer></script>

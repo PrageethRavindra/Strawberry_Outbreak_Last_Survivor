@@ -190,7 +190,7 @@
         const pts = document.createElement('span');
         pts.className = 'pts';
         pts.textContent = `${entry.score} pts`;
-        li.append(medal, name, pts);
+        li.append(medal, window.SurvivalAvatars.canvas(entry.avatar, 26), name, pts);
         return li;
       }));
       $('authTop').hidden = entries.length === 0;
@@ -241,11 +241,17 @@
     (username.value ? password : username).focus();
   }
 
+  // ---- Avatar choice on sign up -------------------------------------------
+  const randomAvatar = window.SurvivalAvatars.list[Math.floor(Math.random() * window.SurvivalAvatars.list.length)].id;
+  const signupAvatar = window.SurvivalAvatars.picker($('signupAvatars'), { selected: randomAvatar, size: 40 });
+
   setMode(mode, false);
 
   window.AuthUI = {
     mode: () => mode,
-    credentials: () => ({ username: username.value.trim(), password: password.value }),
+    credentials: () => mode === 'register'
+      ? { username: username.value.trim(), password: password.value, avatar: signupAvatar.value }
+      : { username: username.value.trim(), password: password.value },
     validate, showError, clearError, setBusy, rememberAccount, onShow
   };
 })();

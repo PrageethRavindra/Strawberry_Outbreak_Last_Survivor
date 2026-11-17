@@ -151,6 +151,25 @@
 .strength { height: 6px; margin-top: 8px; border-radius: 99px; background: var(--ink); overflow: hidden; }
 .strength span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s, background .25s; }
 
+/* Avatar choices (signup row and the menu dialog share .avatar-option) */
+.field-title { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: #e2e8f0; }
+.avatar-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.avatar-option {
+  margin: 0; padding: 8px 4px 6px; display: grid; justify-items: center; gap: 2px;
+  border-radius: 14px; background: var(--ink); border: 1.5px solid var(--line); color: #cbd5e1;
+  font-family: inherit; transition: border-color .15s, transform .15s, background .15s;
+}
+.avatar-option:hover { border-color: #475569; transform: translateY(-2px); }
+.avatar-option.selected {
+  border-color: var(--berry); background: rgba(244, 63, 94, .12); color: #fff;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, .18);
+}
+.avatar-option:focus-visible { outline: 2px solid var(--banana); outline-offset: 2px; }
+.avatar-option strong { font-size: 13px; font-weight: 600; }
+.avatar-option small { font: 11.5px system-ui, 'Segoe UI', Arial, sans-serif; color: var(--muted); text-align: center; }
+.avatar-row .avatar-option strong { font-size: 11.5px; }
+.auth-top .avatar-canvas { flex: none; }
+
 .register-only { display: none; }
 .auth[data-mode="register"] .register-only { display: block; }
 

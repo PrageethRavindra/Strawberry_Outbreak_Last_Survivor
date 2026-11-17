@@ -7,6 +7,33 @@ const runs = require('../src/runs');
 const scores = require('../src/scores');
 const stats = require('../src/stats');
 
+test('players get a default avatar, can pick one at sign up and change it later', async () => {
+  const plain = await auth.register('Avatar_Default', 'password123');
+  assert.equal(plain.avatar, 'soldier');
+  const ninja = await auth.register('Avatar_Ninja', 'password123', 'ninja');
+  assert.equal(ninja.avatar, 'ninja');
+  assert.equal((await auth.login('Avatar_Ninja', 'password123')).avatar, 'ninja');
+  assert.equal(auth.setAvatar(ninja.id, 'robot').avatar, 'robot');
+  assert.equal(auth.getUser(ninja.id).avatar, 'robot');
+});
+
+test('unknown avatars are rejected', async () => {
+  await assert.rejects(() => auth.register('Avatar_Bad', 'password123', 'dragon'), /Unknown avatar/);
+  const user = await auth.register('Avatar_Ok', 'password123');
+  assert.throws(() => auth.setAvatar(user.id, '<script>'), /Unknown avatar/);
+  assert.throws(() => auth.setAvatar(user.id, 42), /Unknown avatar/);
+  assert.equal(auth.getUser(user.id).avatar, 'soldier');
+});
+
+test('leaderboard entries include the player avatar', async () => {
+  const user = await auth.register('Avatar_Board', 'password123', 'wizard');
+  scores.record(user.id, user.username, { ...runs.start(user.id), status: 'won', score: 9999, revivesUsed: 0 });
+  const top = scores.list()[0];
+  assert.equal(top.username, 'Avatar_Board');
+  assert.equal(top.avatar, 'wizard');
+  db.prepare('DELETE FROM scores WHERE user_id = ?').run(user.id); // keep the shared test database clean
+});
+
 test('player stats summarise runs, wins and puzzles', async () => {
   const user = await auth.register('Stats_User', 'password123');
   assert.deepEqual(stats.forUser(user.id), {

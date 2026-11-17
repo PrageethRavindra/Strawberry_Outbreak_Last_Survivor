@@ -3,10 +3,11 @@
   const DASH_COOLDOWN = 1.2;
   const DASH_SPEED = 720;
 
-  function create(x, y) {
+  function create(x, y, avatar = 'soldier') {
     return {
       x,
       y,
+      avatar,
       radius: 16,
       speed: 225,
       shield: 0,
@@ -69,27 +70,12 @@
 
     ctx.globalAlpha = player.dashTime > 0 ? 0.6 : 1;
 
-    // Strawberry body
-    ctx.fillStyle = '#f43f5e';
+    // Ground shadow, then the player's chosen survivor avatar
+    ctx.fillStyle = 'rgba(0, 0, 0, .3)';
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.ellipse(x, y + radius * 0.95, radius * 0.85, radius * 0.28, 0, 0, Math.PI * 2);
     ctx.fill();
-
-    // Seeds
-    ctx.fillStyle = '#fde68a';
-    for (const [sx, sy] of [[-7, -3], [0, -6], [7, -3], [-4, 5], [4, 5], [0, 11]]) {
-      ctx.fillRect(x + sx - 1, y + sy - 1, 2, 3);
-    }
-
-    // Leaves
-    ctx.fillStyle = '#34d399';
-    ctx.beginPath();
-    ctx.moveTo(x - 10, y - radius + 2);
-    ctx.lineTo(x, y - radius - 8);
-    ctx.lineTo(x + 10, y - radius + 2);
-    ctx.lineTo(x, y - radius + 5);
-    ctx.closePath();
-    ctx.fill();
+    window.SurvivalAvatars.draw(ctx, player.avatar, x, y, radius);
 
     ctx.globalAlpha = 1;
 

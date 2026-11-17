@@ -110,7 +110,7 @@
     const level = window.SurvivalStages.get(stageId);
     if (!level) throw new Error('Unknown stage');
     callbacks = handlers;
-    state = { level, player: P.create(400, 240), enemies: [], bullets: [], powerups: [], elapsed: 0,
+    state = { level, player: P.create(400, 240, handlers.avatar), enemies: [], bullets: [], powerups: [], elapsed: 0,
       spawnClock: 0, shootClock: 0, kills: 0, combo: 0, comboTimer: 0, intro: INTRO_SECONDS, goFlash: 0,
       paused: false, userPaused: false, finished: false };
     if (level.bossHp) state.enemies.push(E.spawn(canvas.width, canvas.height, level, true, state.player));

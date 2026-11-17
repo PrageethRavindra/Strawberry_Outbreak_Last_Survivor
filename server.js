@@ -54,7 +54,7 @@ function respondError(res, error) { res.status(400).json({ error: error.message 
 app.get('/api/health', (_, res) => res.json({ status: 'OK', game: 'Strawberry Outbreak' }));
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const user = await auth.register(req.body.username, req.body.password);
+    const user = await auth.register(req.body.username, req.body.password, req.body.avatar);
     req.session.regenerate(err => {
       if (err) return respondError(res, err);
       req.session.user = user;
@@ -72,7 +72,9 @@ app.post('/api/auth/login', async (req, res) => {
     });
   } catch (error) { respondError(res, error); }
 });
-app.get('/api/auth/me', (req, res) => res.json({ user: req.session.user || null }));
+app.get('/api/auth/me', (req, res) => {
+  res.json({ user: req.session.user ? auth.getUser(req.session.user.id) : null });
+});
 app.post('/api/auth/logout', (req, res) => req.session.destroy(() => res.json({ ok: true })));
 
 app.post('/api/run/start', requireUser, (req, res) => {
@@ -110,6 +112,13 @@ app.post('/api/rescue/answer', requireUser, (req, res) => {
   try {
     const run = runs.answer(req.session.user.id, req.body.answer);
     res.json({ correct: run.status === 'playing', run: runs.publicRun(run) });
+  } catch (error) { respondError(res, error); }
+});
+app.post('/api/me/avatar', requireUser, (req, res) => {
+  try {
+    const user = auth.setAvatar(req.session.user.id, req.body.avatar);
+    req.session.user = { ...req.session.user, avatar: user.avatar };
+    res.json({ user });
   } catch (error) { respondError(res, error); }
 });
 app.get('/api/me/stats', requireUser, (req, res) => {
